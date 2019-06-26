@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  mondrik:
+    image: mondrik:latest
+    build: .
+    volumes:
+      - ./app:/usr/src/app
+      - ./pyinstaller:/usr/src/pyinstaller
+      - ../dist:/usr/src/dist
