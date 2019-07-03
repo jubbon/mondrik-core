@@ -15,7 +15,7 @@ from ansible.playbook.play_context import PlayContext
 from ansible.executor.task_queue_manager import TaskQueueManager
 from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.plugins.callback import CallbackBase
-from ansible import context
+from ansible import context as ctx
 import ansible.constants as C
 
 
@@ -40,16 +40,16 @@ class ResultCallback(CallbackBase):
         print("-----")
 
 
-def execute(playbooks):
+def execute(playbooks: list, context: dict):
     '''
     '''
     assert playbooks
 
     os.environ["ANSIBLE_CONDITIONAL_BARE_VARS"] = "False"
 
-    # context._init_global_context({})
+    # ctx._init_global_context({})
     # since the API is constructed for CLI it expects certain options to always be set in the context object
-    context.CLIARGS = ImmutableDict(connection='local',
+    ctx.CLIARGS = ImmutableDict(connection='local',
                                     module_path=['./playbooks/roles'],
                                     forks=1,
                                     become=False,
@@ -74,8 +74,7 @@ def execute(playbooks):
     # variable manager takes care of merging all the different sources to give you a unified view of variables available in each context
     variable_manager = VariableManager(loader=loader, inventory=inventory)
 
-    current_directory = os.getcwd()
-    variable_manager.set_host_variable(host, "current_directory", current_directory)
+    variable_manager.set_host_variable(host, "current_directory", context.get("current_directory", ""))
 
     pbex = PlaybookExecutor(playbooks=playbooks,
                             inventory=inventory,
