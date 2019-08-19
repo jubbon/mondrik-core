@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 from pathlib import Path
 
@@ -22,15 +23,19 @@ def main():
     '''
     '''
     try:
+        post_command = None
         for project_dir in project_subdirs(Path("."), ".mondrik"):
             playbooks = [p for p in project_dir.glob(".mondrik/main.yml")]
             context = dict(
                 current_directory=str(project_dir)
             )
             try:
-                res = execute(playbooks, context=context)
+                res, post_command = execute(playbooks, context=context)
             except Exception as err:
                 print(f"{err}")
+        if post_command:
+            print(f"Executing post-command: {post_command}")
+            os.system(post_command)
     except Exception as err:
         print(f"{err}")
         sys.exit(1)

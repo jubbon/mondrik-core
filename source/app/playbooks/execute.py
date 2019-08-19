@@ -81,4 +81,6 @@ def execute(playbooks: list, context: dict):
                             variable_manager=variable_manager,
                             loader=loader,
                             passwords=passwords)
-    return pbex.run()
+    result = pbex.run()
+    post_command = variable_manager.get_vars()["hostvars"]["localhost"].get("mondrik_post_command")
+    return result, post_command
